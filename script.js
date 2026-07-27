@@ -126,35 +126,91 @@ function animateMeter(target, done) {
   requestAnimationFrame(frame);
 }
 
-shareBtn.addEventListener("click", () => {
-  const shareText = `💘 Love Spark Result\n${currentResult.name1} + ${currentResult.name2} = ${currentResult.score}% love!\n${currentResult.message}`;
+function escapeXml(value) {
+  return String(value)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/\"/g, "&quot;")
+    .replace(/'/g, "&apos;");
+}
 
-  if (navigator.share) {
-    navigator.share({
-      title: "Love Spark Calculator",
-      text: shareText
-    });
-  } else {
-    const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(shareText)}`;
-    window.open(whatsappUrl, "_blank");
-  }
-});
-
-downloadBtn.addEventListener("click", () => {
-  const svg = `
+function buildCardSvg() {
+  return `
     <svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1350" viewBox="0 0 1080 1350">
       <rect width="1080" height="1350" rx="40" fill="#fff7fb"/>
       <rect x="40" y="40" width="1000" height="1270" rx="34" fill="#ffffff"/>
       <circle cx="810" cy="250" r="120" fill="#ffe4ee"/>
       <circle cx="250" cy="980" r="140" fill="#ffe8ca"/>
       <text x="540" y="260" text-anchor="middle" font-size="56" font-family="Arial" fill="#ff5c9a">💘 Love Spark</text>
-      <text x="540" y="400" text-anchor="middle" font-size="36" font-family="Arial" fill="#5b3550">${currentResult.name1} + ${currentResult.name2}</text>
+      <text x="540" y="400" text-anchor="middle" font-size="36" font-family="Arial" fill="#5b3550">${escapeXml(currentResult.name1)} + ${escapeXml(currentResult.name2)}</text>
       <text x="540" y="610" text-anchor="middle" font-size="120" font-family="Arial" font-weight="700" fill="#ff5c9a">${currentResult.score}%</text>
-      <text x="540" y="760" text-anchor="middle" font-size="28" font-family="Arial" fill="#5b3550">${currentResult.message}</text>
+      <text x="540" y="760" text-anchor="middle" font-size="28" font-family="Arial" fill="#5b3550">${escapeXml(currentResult.message)}</text>
       <text x="540" y="1180" text-anchor="middle" font-size="26" font-family="Arial" fill="#9b6b7b">Made with a tiny bit of sparkle and a lot of fun 💖</text>
     </svg>
   `;
+}
 
+async function createCardImageFile() {
+  const svg = buildCardSvg();
+  const svgBlob = new Blob([svg], { type: "image/svg+xml;charset=utf-8" });
+  const svgUrl = URL.createObjectURL(svgBlob);
+  const image = new Image();
+  image.src = svgUrl;
+
+  await new Promise((resolve, reject) => {
+    image.onload = resolve;
+    image.onerror = reject;
+  });
+
+  const canvas = document.createElement("canvas");
+  canvas.width = 1080;
+  canvas.height = 1350;
+
+  const context = canvas.getContext("2d");
+  context.drawImage(image, 0, 0, canvas.width, canvas.height);
+
+  URL.revokeObjectURL(svgUrl);
+
+  const pngBlob = await new Promise((resolve) => {
+    canvas.toBlob(resolve, "image/png");
+  });
+
+  return new File([pngBlob], `love-card-${Date.now()}.png`, { type: "image/png" });
+}
+
+shareBtn.addEventListener("click", async () => {
+  if (!currentResult.name1 || !currentResult.name2) return;
+
+  try {
+    const imageFile = await createCardImageFile();
+
+    if (navigator.share && navigator.canShare && navigator.canShare({ files: [imageFile] })) {
+      await navigator.share({
+        title: "Love Spark Calculator",
+        text: "Check out our love spark result!",
+        files: [imageFile]
+      });
+    } else {
+      const whatsappUrl = `https://wa.me/?text=${encodeURIComponent("Check out our love spark card!")}`;
+      window.open(whatsappUrl, "_blank");
+
+      const downloadUrl = URL.createObjectURL(imageFile);
+      const link = document.createElement("a");
+      link.href = downloadUrl;
+      link.download = imageFile.name;
+      link.click();
+      URL.revokeObjectURL(downloadUrl);
+    }
+  } catch (error) {
+    console.error("Unable to share image", error);
+    const whatsappUrl = `https://wa.me/?text=${encodeURIComponent("Check out our love spark card!")}`;
+    window.open(whatsappUrl, "_blank");
+  }
+});
+
+downloadBtn.addEventListener("click", () => {
+  const svg = buildCardSvg();
   const blob = new Blob([svg], { type: "image/svg+xml;charset=utf-8" });
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
