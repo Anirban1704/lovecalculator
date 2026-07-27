@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Love Spark Calculator</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700&family=Quicksand:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+    <svg style="display: none;">
+      <defs>
+        <linearGradient id="meterGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" style="stop-color: #ff5c9a; stop-opacity: 1" />
+          <stop offset="100%" style="stop-color: #ffd1a9; stop-opacity: 1" />
+        </linearGradient>
+      </defs>
+    </svg>
+  </head>
+  <body>
+    <div class="bg-glow glow-one"></div>
+    <div class="bg-glow glow-two"></div>
+
+    <main class="app-shell">
+      <section class="panel landing-panel" id="landingPanel">
+        <div class="hero-mark">💖</div>
+        <h1>Love Spark Calculator</h1>
+        <p class="subtitle">
+          Enter two sweet names and let the universe do its silly little magic.
+        </p>
+
+        <form id="loveForm" class="love-form">
+          <label class="input-group">
+            <span>Your sweet name</span>
+            <input id="lover1" name="lover1" type="text" placeholder="Aarohi" required />
+          </label>
+
+          <label class="input-group">
+            <span>Their sweet name</span>
+            <input id="lover2" name="lover2" type="text" placeholder="Rohan" required />
+          </label>
+
+          <button type="submit" class="primary-btn">Calculate our spark ✨</button>
+        </form>
+
+        <p class="tiny-note">Purely for fun — no need to take the number too seriously.</p>
+      </section>
+
+      <section class="panel loading-panel hidden" id="loadingPanel" aria-live="polite">
+        <div class="heart-loader">💗</div>
+        <h2>Finding the perfect match...</h2>
+        <p>The hearts are doing their little dance.</p>
+
+        <div class="meter-card">
+          <div class="circular-meter">
+            <svg class="meter-svg" viewBox="0 0 200 200">
+              <circle class="meter-bg" cx="100" cy="100" r="90"></circle>
+              <circle class="meter-progress" id="meterProgress" cx="100" cy="100" r="90"></circle>
+            </svg>
+            <div class="meter-center">
+              <div class="meter-value" id="meterPercent">0%</div>
+              <div class="meter-label">Love Match</div>
+            </div>
+          </div>
+          <div class="meter-caption">💕 Love energy rising</div>
+        </div>
+      </section>
+
+      <section class="panel result-panel hidden" id="resultPanel" aria-live="polite">
+        <div class="result-card" id="resultCard">
+          <div class="result-header">
+            <div class="result-badge">💘</div>
+            <h2>Love verdict</h2>
+          </div>
+
+          <div class="score-circle" id="scoreCircle">0%</div>
+          <p class="result-message" id="resultMessage">A tiny spark is forming.</p>
+          <p class="result-footnote" id="resultFootnote">
+            Your names are making the cosmos giggle.
+          </p>
+
+          <div class="result-actions">
+            <button class="secondary-btn" id="shareBtn">Share on WhatsApp</button>
+            <button class="secondary-btn alt" id="downloadBtn">Download card</button>
+            <button class="secondary-btn" id="homeBtn">Go to Home</button>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <script src="script.js"></script>
+  </body>
+</html>
